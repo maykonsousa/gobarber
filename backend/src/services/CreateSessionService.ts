@@ -3,6 +3,7 @@ import { compare } from 'bcryptjs';
 import { sign } from 'jsonwebtoken';
 import UserModel from '../models/UserModel';
 import AuthConfig from '../config/auth';
+import AppError from '../errors/AppError';
 
 interface RequestDTO {
   email: string;
@@ -21,12 +22,12 @@ class CreateSessionService {
     });
 
     if (!user) {
-      throw new Error('User not found');
+      throw new AppError('User not found', 401);
     }
     // verifica se a senha está correta
     const passwordMatch = await compare(password, user.password);
     if (!passwordMatch) {
-      throw new Error('Password incorrect');
+      throw new AppError('Password incorrect', 401);
     }
     const { secret, expiresIn } = AuthConfig.jwt;
 

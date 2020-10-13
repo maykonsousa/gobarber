@@ -1,6 +1,7 @@
 import { getRepository } from 'typeorm';
-import UserModel from '../models/UserModel';
 import { hash } from 'bcryptjs';
+import UserModel from '../models/UserModel';
+import AppError from '../errors/AppError';
 
 interface RequestDTO {
   name: string;
@@ -16,16 +17,16 @@ class CreateUserService {
   }: RequestDTO): Promise<UserModel> {
     const userRepository = getRepository(UserModel);
 
-    //verificar se o usuário já existe
+    // verificar se o usuário já existe
     const checkUserExists = await userRepository.findOne({
       where: { email },
     });
 
     if (checkUserExists) {
-      throw new Error('The informed email already exists');
+      throw new AppError('The informed email already exists');
     }
 
-    //criptografar a senha
+    // criptografar a senha
 
     const hashedPassword = await hash(password, 8);
 
