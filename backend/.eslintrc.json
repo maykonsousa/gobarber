@@ -24,6 +24,7 @@
     "prettier"
   ],
   "rules": {
+    "no-console":"off",
     "no-underscore-dangle": "error",
     "no-useless-constructor": "off",
     "prettier/prettier": "error",
