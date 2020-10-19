@@ -8,6 +8,8 @@ import logoImg from '../../assets/logo.svg';
 import Input from '../../components/Input';
 import Button from '../../components/Button';
 import { useAuth } from '../../context/AuthContext';
+import { useToast } from '../../context/ToastContext';
+
 import getValidationErrors from '../../utils/getValidationErrors';
 
 interface SignFormData {
@@ -17,6 +19,7 @@ interface SignFormData {
 const SignIn: React.FC = () => {
   const formRef = useRef<FormHandles>(null);
   const { signIn } = useAuth();
+  const { addToast } = useToast();
 
   const handleSubmit = useCallback(
     async (data: SignFormData) => {
@@ -31,16 +34,23 @@ const SignIn: React.FC = () => {
           abortEarly: false,
         });
 
-        signIn({
+        await signIn({
           email: data.email,
           password: data.password,
         });
       } catch (err) {
-        const errors = getValidationErrors(err);
-        formRef.current?.setErrors(errors);
+        if (err instanceof Yup.ValidationError) {
+          const errors = getValidationErrors(err);
+          formRef.current?.setErrors(errors);
+        }
+        addToast({
+          type: 'error',
+          title: 'Falha no Login',
+          description: 'verifique as suas credenciais',
+        });
       }
     },
-    [signIn],
+    [signIn, addToast],
   );
   return (
     <Container>
